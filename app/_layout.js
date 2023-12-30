@@ -7,19 +7,19 @@ import { router } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from "react";
-import {border} from './util'
+import { border } from './util'
 
 //dimesion of background.png: 379 x 750
-const   windowWidth = Dimensions.get('window').width,
-        windowHeight = Dimensions.get('window').height,
-        bookHeight = 750,
-        bookWidth = 380,
-        bookPR = 40,
-        bookPB = 45,
-        bookPT = 46,
-        bookNavigationBP = 12,
-        bookInScreenRatio = 0.98,
-        bookInScreenPB = 0.07;
+const windowWidth = Dimensions.get('window').width,
+    windowHeight = Dimensions.get('window').height,
+    bookHeight = 2250,
+    bookWidth = 1134,
+    bookPR = 120,
+    bookPB = 135,
+    bookPT = 186,
+    bookNavigationBP = 36,
+    bookInScreenRatio = 0.97,
+    bookInScreenPB = 0.07;
 
 const styles = StyleSheet.create({
     Base: {
@@ -31,24 +31,24 @@ const styles = StyleSheet.create({
     BaseImg: {
         position: "absolute",
         width: "100%",
-        bottom: bookInScreenPB*100+"%",
-        left: 0
+        bottom: bookInScreenPB * 100 + "%",
+        height: bookHeight/bookWidth*windowWidth*bookInScreenRatio,
+        left: 0,
     },
     navigations: {
         position: "absolute",
-        top: windowHeight*(1-(bookNavigationBP/bookHeight+bookInScreenPB)),
+        top: windowHeight * (1 - (bookNavigationBP / bookHeight + bookInScreenPB)),
         left: 0,
-        width: windowWidth*bookInScreenRatio,
+        width: windowWidth * bookInScreenRatio,
         display: "flex",
         flexDirection: "row",
-        // gap: 10,
         justifyContent: "space-between",
         paddingHorizontal: "10%",
-        height: windowHeight*(bookInScreenPB-0.01),
+        height: windowHeight * (bookInScreenPB - 0.01),
     },
     navBtn: {
         flex: 1,
-        width: windowHeight*(bookInScreenPB-0.01),
+        width: windowHeight * (bookInScreenPB - 0.01),
         height: "100%"
     },
     navBtnImg: {
@@ -58,14 +58,14 @@ const styles = StyleSheet.create({
     container: {
         position: "absolute",
         left: 0,
-        width: bookInScreenRatio*100 + "%",
+        width: bookInScreenRatio * 100 + "%",
         height: "100%",
         top: "0%",
     },
     containerPadding: {
-        paddingTop: windowHeight*(1-bookInScreenRatio)+windowHeight*bookInScreenRatio*(bookPT/bookHeight),
-        paddingBottom: windowHeight*bookInScreenRatio*(bookInScreenPB + bookPB/bookHeight),
-        paddingRight: windowWidth*bookInScreenRatio*(bookPR/bookWidth),
+        paddingTop: windowHeight * (1 - bookInScreenRatio) + windowHeight * bookInScreenRatio * (bookPT / bookHeight),
+        paddingBottom: windowHeight * bookInScreenRatio * (bookInScreenPB + bookPB / bookHeight),
+        paddingRight: windowWidth * bookInScreenRatio * (bookPR / bookWidth),
         width: "100%", height: "100%"
     }
 })
@@ -85,20 +85,20 @@ const NavigateButton = (props) => {
 
 export default function Layout() {
 
-    
+
     const [fontsLoaded] = useFonts({
         'PressStart2P-Regular': require('./assets/fonts/PressStart2P-Regular.ttf'),
         'PixelifySans': require('./assets/fonts/PixelifySans-VariableFont_wght.ttf'),
-      });
-      const onLayoutRootView = useCallback(async () => {
+    });
+    const onLayoutRootView = useCallback(async () => {
         if (fontsLoaded) {
-          await SplashScreen.hideAsync();
+            await SplashScreen.hideAsync();
         }
-      }, [fontsLoaded]);
-    
-      if (!fontsLoaded) {
+    }, [fontsLoaded]);
+
+    if (!fontsLoaded) {
         return null;
-      }
+    }
 
     return <View style={styles.Base}>
 
@@ -106,13 +106,13 @@ export default function Layout() {
             <Image
                 source={require('./assets/background.png')}
                 style={styles.BaseImg}
-                resizeMode="contain"
-                />
+                resizeMode="cover"
+            />
             <View style={styles.containerPadding}>
                 <Slot />
             </View>
         </View>
-        
+
         <View style={styles.navigations}>
             <NavigateButton img={require('./assets/diary/mainbutton.png')} path="/" />
             <NavigateButton img={require('./assets/diary/wbutton3.png')} path="/diarypage" />
