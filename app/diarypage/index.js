@@ -121,43 +121,43 @@ const DiaryPage = () => {
       },
     };
   
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const imageSource = response.uri;
-        console.log('Image source:', imageSource);
+    // launchImageLibrary(options, (response) => {
+    //   if (response.didCancel) {
+    //     console.log('User cancelled image picker');
+    //   } else if (response.error) {
+    //     console.log('ImagePicker Error: ', response.error);
+    //   } else if (response.customButton) {
+    //     console.log('User tapped custom button: ', response.customButton);
+    //   } else {
+    //     const imageSource = response.uri;
+    //     console.log('Image source:', imageSource);
     
-        const formData = new FormData();
-        formData.append('image', {
-          uri: imageSource,
-          type: response.type,
-          name: 'photo.jpg',
-        });
+    //     const formData = new FormData();
+    //     formData.append('image', {
+    //       uri: imageSource,
+    //       type: response.type,
+    //       name: 'photo.jpg',
+    //     });
     
-        formData.append('petid', 'your_pet_id');
-        formData.append('userid', 'your_user_id');
-        formData.append('date', date);
+    //     formData.append('petid', 'your_pet_id');
+    //     formData.append('userid', 'your_user_id');
+    //     formData.append('date', date);
     
-        const uploadUrl = 'http://107.191.60.115:81/Diary/UploadImage';
+    //     const uploadUrl = 'http://107.191.60.115:81/Diary/UploadImage';
     
-        axios.post(uploadUrl, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then((uploadResponse) => {
-          console.log('Image uploaded successfully:', uploadResponse.data);
-        })
-        .catch((uploadError) => {
-          console.error('Error uploading image:', uploadError);
-        });
-      }
-    });
+    //     axios.post(uploadUrl, formData, {
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data',
+    //       },
+    //     })
+    //     .then((uploadResponse) => {
+    //       console.log('Image uploaded successfully:', uploadResponse.data);
+    //     })
+    //     .catch((uploadError) => {
+    //       console.error('Error uploading image:', uploadError);
+    //     });
+    //   }
+    // });
   };
 
   // const formattedDate = new Intl.DateTimeFormat('en-US', {
