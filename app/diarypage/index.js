@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ImageBackground, Image, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
 import styles from './style';
 import { normalText } from '../util';
-import Button from '../common/Button';
+import Button from '../components/Button';
 
 const NormalTextInput = (props) => {
   return (
