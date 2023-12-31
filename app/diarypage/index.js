@@ -201,7 +201,9 @@ const DiaryPage = () => {
         <Image
           source={require('../assets/diary/heart.png')}
           style={{
-            marginRight: 5
+            marginRight: 5,
+            width: 30,
+            height: 30
           }}
         />
         <Text style={normalText}>Health & Care</Text>
@@ -217,8 +219,6 @@ const DiaryPage = () => {
       <View style={{flexDirection: 'row', justifyContent:'flex-end', width: "100%"}}>
         <Button label="save" onPress={handleSave} style={{marginTop:5, marginRight: 10}}/>
       </View>
-
-
     </View>
   );
 };

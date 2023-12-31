@@ -67,3 +67,42 @@ const styles = StyleSheet.create({
         zIndex: 1
     }
 });
+
+export const dummyProductList = [
+    {
+        Image: 'http://107.191.60.115:81/image/shop/blue_hat.png',
+        posX: 0,
+        posY: 0,
+        width: 100,
+        height: 50,
+        productid: "blue_hat.png",
+        type: "hat"
+    },
+    {
+        Image: 'http://107.191.60.115:81/image/shop/mex_hat.png',
+        posX: 0,
+        posY: 100,
+        width: 100,
+        height: 50,
+        productid: "mex_hat.png",
+        type: "hat"
+    },
+    {
+        Image: 'http://107.191.60.115:81/image/shop/blue_hat.png',
+        posX: 100,
+        posY: 0,
+        width: 100,
+        height: 50,
+        productid: "blue_hat.png",
+        type: "hat"
+    },
+    {
+        Image: 'http://107.191.60.115:81/image/shop/straw_hat.png',
+        posX: 100,
+        posY: 100,
+        width: 100,
+        height: 50,
+        productid: "straw_hat.png",
+        type: "hat"
+    },
+] 

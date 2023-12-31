@@ -1,12 +1,16 @@
 import { View, Text } from "react-native";
 import { Image } from 'expo-image'
-import { ImageBackground } from './util'
+import { dummyProductList, ImageBackground } from './util'
 import styles from "./style";
 import CalendarScreen from "./components/Calendar";
 import { router } from 'expo-router';
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import PetDisplay from "./components/PetDisplay";
+import { useState } from "react";
 
 const HomePage = () => {
+
+    const [productList , setProductList] = useState(dummyProductList)
 
     return (
         <View style={styles.HomePageContainer}>
@@ -17,6 +21,7 @@ const HomePage = () => {
                     source={require('./assets/board.png')}
                     style={styles.board}
                     >
+                    <PetDisplay productList={productList} edit={false} setProductList={setProductList}/>
                 </ImageBackground>
             </TouchableWithoutFeedback>
 
