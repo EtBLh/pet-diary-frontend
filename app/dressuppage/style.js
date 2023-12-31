@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 import { boardsSize, boardRatio } from '../style';
-import { border } from '../util';
+import { border, displayText } from '../util';
 
 const itemBoxRatio = 350/354;
 
@@ -15,14 +15,13 @@ const styles = StyleSheet.create({
         height: boardsSize / boardRatio,
     },
     arrow: {
-        fontFamily: 'PressStart2P-Regular',
+        ...displayText,
         fontSize: 20,
         width: 40,
         textAlign: 'center'
     },
     itemCatergory: {
-        fontFamily: 'PressStart2P-Regular',
-        fontSize: 15,
+        ...displayText,
         flex: 1,
         textAlign: "center"
     },
@@ -34,9 +33,15 @@ const styles = StyleSheet.create({
         paddingTop: 10
     },
     itemBox: {
+        display: 'flex',
         width: boardsSize/3 - 10,
         height: boardsSize/3 - 10,
-        margin: 5
+        margin: 5,
+        paddingBottom: 40/354*100+"%"
+    },
+    itemImg: {
+        width: "100%",
+        flex: 1
     }
 })
 

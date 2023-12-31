@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native'
 import {border, normalText} from '../util'
+import { boardsSize, boardRatio } from '../style';
 
 const styles = StyleSheet.create({
   
@@ -11,7 +12,7 @@ const styles = StyleSheet.create({
   },
 
   dateContainer: {
-    width: "100%",
+    width: boardsSize,
     display: "flex",
     flexDirection: 'row',  
     alignItems: 'center',
@@ -21,6 +22,8 @@ const styles = StyleSheet.create({
   dateText: {
     ...normalText,
     letterSpacing: 0.8,
+    flex: 1,
+    textAlign: 'center'
   },
   uploadImage: {
     alignItems: 'center',
@@ -28,14 +31,19 @@ const styles = StyleSheet.create({
   commentContainer: {
     alignItems: 'center',
   },
-  buttonContainer: {
-    marginLeft: 10,  
-    marginRight: 10, 
+  dateArrowContainer: {
+    width: 40,
+    textAlign: 'center'
   },
   
   image: {
     width: 300,
     resizeMode: 'contain',
+  },
+  board: {
+      width: boardsSize,
+      height: boardsSize / boardRatio,
+      contentFit: 'contain',
   },
 
 

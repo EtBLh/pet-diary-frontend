@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
-import { TouchableOpacity, ImageBackground, Text } from 'react-native';
-import { normalText } from '../util';
+import { Pressable, StyleSheet, Text } from 'react-native'
+import { ImageBackground } from '../util';
+import { displayText } from '../util';
 
 const styles = StyleSheet.create({
       button: {
@@ -19,17 +19,30 @@ const styles = StyleSheet.create({
 })
 
 const Button = (props) => {
-    return (
-        <TouchableOpacity onPress={props.onPress} style={[styles.button, props.style]}>
+
+  const PressableProps = {
+    style: ({ pressed }) => [styles.button, props.style],
+    onPress: props.onPress
+  };
+
+  const normalBgImg = require('../assets/button.png'),
+        pressedBgImg = require('../assets/button-pressed.png');
+
+  return (
+      <Pressable {...PressableProps}>
+      {
+        ({ pressed }) => (
           <ImageBackground
-            source={require('../assets/button.png')}  // 背景图片路径
-            style={styles.background}
-            resizeMode="contain"
-          >
-            <Text style={normalText}>{props.label}</Text>
-          </ImageBackground>
-        </TouchableOpacity>
-    )
+          source={pressed?pressedBgImg:normalBgImg}  // 背景图片路径
+          style={styles.background}
+          resizeMode="contain"
+        >
+          <Text style={{...displayText, fontSize: 12, marginTop: pressed?3/39*100+"%":undefined}}>{props.label}</Text>
+        </ImageBackground>
+        )
+      }
+      </Pressable>
+  )
 }
 
 export default Button;

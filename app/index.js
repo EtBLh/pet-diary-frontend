@@ -1,4 +1,6 @@
-import { View,Image, ImageBackground, Text } from "react-native";
+import { View, Text } from "react-native";
+import { Image } from 'expo-image'
+import { ImageBackground } from './util'
 import styles from "./style";
 import CalendarScreen from "./components/Calendar";
 import { router } from 'expo-router';
@@ -9,8 +11,7 @@ const HomePage = () => {
     return (
         <View style={styles.HomePageContainer}>
             <TouchableWithoutFeedback onPress={() => {
-                console.log('fuck');
-                router.push('/dressuppage')
+                router.replace('/dressuppage')
             }}>
                 <ImageBackground
                     source={require('./assets/board.png')}

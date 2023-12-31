@@ -18,7 +18,8 @@ const styles = StyleSheet.create({
     },
     board: {
         width: boardsSize,
-        height: boardsSize / boardRatio
+        height: boardsSize / boardRatio,
+        contentFit: 'contain',
     },
     dataBoard: {
         width: boardsSize,

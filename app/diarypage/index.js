@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, Image, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
+import {displayText, ImageBackground} from '../util'
+import { Image } from 'expo-image';
 import styles from './style';
 import { normalText } from '../util';
 import Button from '../components/Button';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
+import { boardsSize } from '../style';
 
 const NormalTextInput = (props) => {
   return (
@@ -147,28 +150,18 @@ const DiaryPage = () => {
     <View style={styles.petDiaryContainer}>
       <View style={styles.dateContainer}>
         {/* 左侧按钮 */}
-        <View style={styles.buttonContainer}>
           <TouchableWithoutFeedback onPress={handlePreviousDate}>
-            <Image
-              source={require('../assets/diary/left_para.png')}
-              style={styles.buttonImage}
-            />
+            <Text style={{...displayText, ...styles.dateArrowContainer}}>{"<"}</Text>
           </TouchableWithoutFeedback>
-        </View>
 
-        <Text style={styles.dateText}>
-          {`${date} ${weekday}`}
-        </Text>
+          <Text style={styles.dateText}>
+            {`${date} ${weekday}`}
+          </Text>
 
         {/* 右侧按钮 */}
-        <View style={styles.buttonContainer}>
-          <TouchableWithoutFeedback onPress={handleNextDate} style={styles.buttonContainer}>
-            <Image
-              source={require('../assets/diary/right_para.png')}  // 自定义的右箭头图像
-              style={styles.buttonImage}
-            />
+          <TouchableWithoutFeedback onPress={handleNextDate}>
+            <Text style={{...displayText, ...styles.dateArrowContainer}}>{">"}</Text>
           </TouchableWithoutFeedback>
-        </View>
       </View>
 
       {/* 上傳圖片 */}
@@ -176,7 +169,7 @@ const DiaryPage = () => {
         <TouchableWithoutFeedback onPress={pickImage}>
           <Image
             source={require('../assets/diary/addphoto.png')}
-            style={styles.image}
+            style={styles.board}
           />
         </TouchableWithoutFeedback>
       </View>
