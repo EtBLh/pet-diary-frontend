@@ -1,7 +1,16 @@
 import React from 'react';
 import { useStorageState } from './useStorageState';
 
-const AuthContext = React.createContext({
+export interface TAuth{
+  signIn: (userid:string, petid:string) => void,
+  signOut: () => void,
+  userid: null | String,
+  petid: null | String,
+  UisLoading: Boolean,
+  PisLoading: Boolean
+}
+
+const AuthContext = React.createContext<TAuth>({
     signIn: (userid, petid) => null,
     signOut: () => null,
     userid: null, // null | string
@@ -22,7 +31,7 @@ export function useAuth() {
   return value;
 }
 
-export function AuthProvider(props) {
+export function AuthProvider(props: React.PropsWithChildren) {
   const [[UisLoading, userid], setUserid] = useStorageState('userid');
   const [[PisLoading, petid], setPetid] = useStorageState('petid');
 
