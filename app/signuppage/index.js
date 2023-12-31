@@ -7,7 +7,7 @@ const PetButton = ({ petId, petName, isPetSelected, onPress }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={() => onPress(petId)}>
       <ImageBackground 
-        source={isPetSelected(petId) ? require('./assets/sign/target_option.png') : require('./assets/sign/option_button.png')}
+        source={isPetSelected(petId) ? require('../assets/sign/target_option.png') : require('../assets/sign/option_button.png')}
         style={isPetSelected(petId) ? styles.selectedbuttonImage : styles.buttonImage}
         resizeMode="contain"
       >
@@ -45,8 +45,8 @@ const PetDiaryPage = () => {
   useEffect(() => {
     const loadFont = async () => {
       await Font.loadAsync({
-        'PressStart2P-Regular': require('./assets/fonts/PressStart2P-Regular.ttf'),
-        'PixelifySans': require('./assets/fonts/PixelifySans-VariableFont_wght.ttf'),
+        'PressStart2P-Regular': require('../assets/fonts/PressStart2P-Regular.ttf'),
+        'PixelifySans': require('../assets/fonts/PixelifySans-VariableFont_wght.ttf'),
       });
     };
     loadFont();
@@ -56,7 +56,7 @@ const PetDiaryPage = () => {
   return (
     // 背景
     <ImageBackground
-      source={require('./assets/background.png')}
+      source={require('../assets/background.png')}
       style={styles.petDiaryContainer}
       resizeMode="cover" 
     >
@@ -67,7 +67,7 @@ const PetDiaryPage = () => {
       
       <View style={styles.imageContainer}>
         <Image
-          source={require('./assets/sign/title.png')} 
+          source={require('../assets/sign/title.png')} 
           style={styles.image}
         />
       </View>
@@ -144,7 +144,7 @@ const PetDiaryPage = () => {
         <View style={styles.row}>
         <TouchableOpacity style={styles.genderbutton} onPress={() => genderPress(1)}>
           <ImageBackground 
-            source={isGenderSelected(1) ? require('./assets/sign/select_female.png') : require('./assets/sign/female.png')}
+            source={isGenderSelected(1) ? require('../assets/sign/select_female.png') : require('../assets/sign/female.png')}
             style={isGenderSelected(1) ? styles.selectedbuttonImage : styles.buttonImage}
             resizeMode="contain"
           >
@@ -153,7 +153,7 @@ const PetDiaryPage = () => {
         
         <TouchableOpacity style={styles.genderbutton} onPress={() => genderPress(2)}>
         <ImageBackground 
-            source={isGenderSelected(2) ? require('./assets/sign/select_male.png') : require('./assets/sign/male.png')}
+            source={isGenderSelected(2) ? require('../assets/sign/select_male.png') : require('../assets/sign/male.png')}
             style={isGenderSelected(2) ? styles.selectedbuttonImage : styles.buttonImage}
             resizeMode="contain"
           >
@@ -167,7 +167,7 @@ const PetDiaryPage = () => {
     <View style={styles.saveContainer}>
         <TouchableOpacity onPress={handleEvent} style={styles.saveButton}>
           <ImageBackground
-            source={require('./assets/sign/savebutton.png')}  
+            source={require('../assets/sign/savebutton.png')}  
             style={styles.saveBackground}
             resizeMode="contain"
           >
