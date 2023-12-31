@@ -8,7 +8,6 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import PetDisplay from "./components/PetDisplay";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from "../ctx/auth";
 
 const HomePage = () => {
 
@@ -49,8 +48,7 @@ const HomePage = () => {
 
   return (
     <View style={styles.HomePageContainer}>
-      <Text>{auth.petid}</Text>
-      <TouchableWithoutFeedback onPress={() => {
+       <TouchableWithoutFeedback onPress={() => {
         router.replace('/dressuppage')
       }}>
         <ImageBackground
