@@ -121,7 +121,7 @@ export default function Layout() {
             <NavigateButton img={require('./assets/diary/mainbutton.png')} path="/" />
             <NavigateButton img={require('./assets/diary/wbutton3.png')} path="/diarypage" />
             <NavigateButton img={require('./assets/diary/healthbutton.png')} path="/" />
-            <NavigateButton img={require('./assets/diary/settingbutton.png')} path="/"
+            <NavigateButton img={require('./assets/diary/settingbutton.png')} path="/dressuppage"
             />
         </View>
     </View>

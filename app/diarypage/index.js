@@ -14,8 +14,9 @@ const NormalTextInput = (props) => {
         <TextInput
           style={styles.normalTextInputField}
           placeholder={props.placeholder}
+          onChangeText={props.onChangeText} 
         />
-        <Text style={normalText}>{props.suffix}</Text>
+        <Text style={normalText}>{props.value}{props.suffix}</Text>
       </View>
     </View>
   )
@@ -37,10 +38,80 @@ const DiaryPage = () => {
   const [weekday, setWeekday] = useState('');
   const [date, setDate] = useState('');
 
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(require('../assets/diary/addphoto.png'));
+
+  useEffect(() => {
+      fetchDataFromApi()
+        .then((data) => {
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        });
+    }, [date]);
+
+  const fetchDataFromApi = async () => {
+      try {
+        const response = await axios.post('http://107.191.60.115:81/Diary/GetDiaryInfo', {
+          petid: "username_petName",
+          date: date
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const data = response.data;
+        setComment(data.content);
+        setPlace(data.place);
+        setMood(data.mood);
+        setWeight(data.weight);
+        setWaterIntake(data.water_intake);
+        setFoodIntake(data.food_intake);
+        setDefecation(data.defecation);
+        setAbnormality(data.abnormality);
+        setMedicalRecord(data.medical_record);
+
+
+        if (data.image !== null) {
+          setSelectedImage({ uri: data.image });
+        } else {
+          setSelectedImage(require('../assets/diary/addphoto.png'));
+        }
+
+        return response.data;
+      } catch (error) {
+        throw error;
+      }
+    };
+
+
+
+  const uploadImageToServer = async (userID, petID, date, imageUri) => {
+    try {
+      const formData = new FormData();
+      formData.append('userID', userID);
+      formData.append('petID', petID);
+      formData.append('date', date);
+      formData.append('image', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'photo.jpg',
+      });
+  
+      const response = await axios.post('http://107.191.60.115:81/Diary/UploadImage', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      return response.data.image; // Assuming the server responds with an image URL
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -48,17 +119,17 @@ const DiaryPage = () => {
       quality: 1,
     });
 
-    console.log(result);
-
+    const image_url = await uploadImageToServer('username_password', 'username_petName', '2023-12-31', result.uri);
+    console.log('Image URL:', image_url);
     if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
+      setSelectedImage({ uri: image_url });
     }
   };
 
 
   const handleSave = () => {
     const data = {
-      petid: "petid",
+      petid: "username_petName",
       date: date,
       content: comment,
       place: place,
@@ -71,6 +142,8 @@ const DiaryPage = () => {
       medical_record: medicalRecord,
     };
 
+    console.log(data)
+
     axios.post('http://107.191.60.115:81/Diary/UploadDiary', data)
       .then(response => {
         console.log(response.data);
@@ -78,10 +151,12 @@ const DiaryPage = () => {
       .catch(error => {
         console.error(error);
       });
+    
+    
   }
 
 
-  const handlePreviousDate = () => {
+  const handlePreviousDate = async () => {
     const [month, day, year] = date.split('/');
     const formattedDate = `${year}-${month}-${day}`;
 
@@ -100,6 +175,7 @@ const DiaryPage = () => {
     const [newWeekday, newDate] = formattedPreviousDate.split(', ');
     setWeekday(newWeekday);
     setDate(newDate);
+
   };
 
   const handleNextDate = () => {
@@ -175,7 +251,7 @@ const DiaryPage = () => {
       <View style={styles.uploadImage}>
         <TouchableWithoutFeedback onPress={pickImage}>
           <Image
-            source={require('../assets/diary/addphoto.png')}
+            source={selectedImage}
             style={styles.image}
           />
         </TouchableWithoutFeedback>
