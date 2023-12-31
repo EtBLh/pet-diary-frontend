@@ -30,7 +30,8 @@ const PetCalendar = (props) => {
                 textDayHeaderFontSize: 10,
                 textMonthFontFamily: 'PressStart2P-Regular',
                 textMonthFontSize: 12,
-                monthTextColor: 'rgba(0,0,0,0.8)'
+                monthTextColor: 'rgba(0,0,0,0.8)',
+                arrowColor: "black"
             }}
             style={styles.calendar}
             onDayPress={onDayPress}

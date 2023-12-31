@@ -3,9 +3,8 @@ import { View, ImageBackground, Image, Text, TextInput, TouchableWithoutFeedback
 import styles from './style';
 import { normalText } from '../util';
 import Button from '../components/Button';
-import axios from 'axios'; 
-import ImagePicker from 'react-native-image-picker';
-import { launchImageLibrary } from 'react-native-image-picker';
+import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
 
 const NormalTextInput = (props) => {
   return (
@@ -38,6 +37,24 @@ const DiaryPage = () => {
   const [weekday, setWeekday] = useState('');
   const [date, setDate] = useState('');
 
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+
 
   const handleSave = () => {
     const data = {
@@ -62,7 +79,6 @@ const DiaryPage = () => {
         console.error(error);
       });
   }
-  // const [selectedImage, setSelectedImage] = useState(require('../assets/diary/board.png'));
 
 
   const handlePreviousDate = () => {
@@ -112,63 +128,6 @@ const DiaryPage = () => {
     // 可以使用日期库，比如 Moment.js 或 JavaScript 内置的 Date 对象
   };
 
-  const handleChooseImage = () => {
-    const options = {
-      title: 'Select Image',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-  
-    // launchImageLibrary(options, (response) => {
-    //   if (response.didCancel) {
-    //     console.log('User cancelled image picker');
-    //   } else if (response.error) {
-    //     console.log('ImagePicker Error: ', response.error);
-    //   } else if (response.customButton) {
-    //     console.log('User tapped custom button: ', response.customButton);
-    //   } else {
-    //     const imageSource = response.uri;
-    //     console.log('Image source:', imageSource);
-    
-    //     const formData = new FormData();
-    //     formData.append('image', {
-    //       uri: imageSource,
-    //       type: response.type,
-    //       name: 'photo.jpg',
-    //     });
-    
-    //     formData.append('petid', 'your_pet_id');
-    //     formData.append('userid', 'your_user_id');
-    //     formData.append('date', date);
-    
-    //     const uploadUrl = 'http://107.191.60.115:81/Diary/UploadImage';
-    
-    //     axios.post(uploadUrl, formData, {
-    //       headers: {
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //     })
-    //     .then((uploadResponse) => {
-    //       console.log('Image uploaded successfully:', uploadResponse.data);
-    //     })
-    //     .catch((uploadError) => {
-    //       console.error('Error uploading image:', uploadError);
-    //     });
-    //   }
-    // });
-  };
-
-  // const formattedDate = new Intl.DateTimeFormat('en-US', {
-  //   year: 'numeric',
-  //   month: 'numeric',
-  //   day: 'numeric',
-  //   weekday: 'long',
-  // }).format(new Date());
-
-  // const [weekday, date] = formattedDate.split(', ');
-
   useEffect(() => {
     const newFormattedDate = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -214,7 +173,7 @@ const DiaryPage = () => {
 
       {/* 上傳圖片 */}
       <View style={styles.uploadImage}>
-        <TouchableWithoutFeedback onPress={handleChooseImage}>
+        <TouchableWithoutFeedback onPress={pickImage}>
           <Image
             source={require('../assets/diary/addphoto.png')}
             style={styles.image}

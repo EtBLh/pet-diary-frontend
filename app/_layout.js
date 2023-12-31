@@ -9,6 +9,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from "react";
 import { border } from './util'
 
+import { Logs } from 'expo'
+
+Logs.enableExpoCliLogging()
+
 //dimesion of background.png: 379 x 750
 const windowWidth = Dimensions.get('window').width,
     windowHeight = Dimensions.get('window').height,

@@ -1,18 +1,23 @@
 import { View,Image, ImageBackground, Text } from "react-native";
 import styles from "./style";
 import CalendarScreen from "./components/Calendar";
+import { router } from 'expo-router';
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 const HomePage = () => {
 
     return (
         <View style={styles.HomePageContainer}>
-            <View style={[{marginTop: 0}]}>
+            <TouchableWithoutFeedback onPress={() => {
+                console.log('fuck');
+                router.push('/dressuppage')
+            }}>
                 <ImageBackground
                     source={require('./assets/board.png')}
                     style={styles.board}
                     >
                 </ImageBackground>
-            </View>
+            </TouchableWithoutFeedback>
 
             <View>
                 <ImageBackground
