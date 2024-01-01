@@ -2,6 +2,9 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
+export const boardRatio = 652/414;
+export const boardsSize = 320;
+
 export const border = {
     borderWidth: 4,
     borderColor: "red"
@@ -106,3 +109,17 @@ export const dummyProductList = [
         type: "hat"
     },
 ]
+
+const   PDRatio = 600/370,
+        PDH = 600/646,
+        PDV = 370/414,
+        PDT = 25/414,
+        PDL = 19/646
+
+export const boardContent = {
+    width: PDH * boardsSize,
+    height: PDV * boardsSize / boardRatio,
+    position: 'absolute',
+    top: PDT*100+"%",
+    left: PDL*100+"%"
+}

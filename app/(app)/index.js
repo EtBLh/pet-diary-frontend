@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import { Image } from 'expo-image'
 import { dummyProductList, ImageBackground } from '../util'
 import styles from "./style";
-import CalendarScreen from "./components/Calendar";
+import Calendar from "./components/Calendar";
 import { router } from 'expo-router';
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import PetDisplay from "./components/PetDisplay";
@@ -12,7 +12,7 @@ import { useAuth } from "../ctx/auth";
 
 const HomePage = () => {
 
-  const [dressList, setDressList] = useState(dummyProductList)
+  const [dressList, setDressList] = useState([])
   const [userData, setUserData] = useState({
     name: '',
     breed: '',
@@ -23,31 +23,19 @@ const HomePage = () => {
   const auth = useAuth()
 
   useEffect(() => {
-    fetchDataFromApi()
-      .then((data) => {
-        setUserData(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  const fetchDataFromApi = async () => {
-    try {
-      const response = await axios.post('http://107.191.60.115:81/Main/GetMainPagePetInfo', {
+    axios.post('http://107.191.60.115:81/Main/GetMainPagePetInfo', {
         userID: auth.userid,
         petID: auth.petid
       }, {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
-
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  };
+      }).then(res => {
+        setUserData(res.data);
+        setDressList(res.data.DressUpProduct)
+      })
+      .catch(err => console.log(err))
+  }, []);
 
   return (
     <View style={styles.HomePageContainer}>
@@ -58,7 +46,12 @@ const HomePage = () => {
           source={require('./assets/board.png')}
           style={styles.board}
         >
-          <PetDisplay dressList={dressList} edit={false} setDressList={setDressList} />
+          <PetDisplay
+              setDressList={setDressList}
+              dressList={dressList.filter(dress => {
+                  return dress.equipped;
+              })}
+          />        
         </ImageBackground>
       </TouchableWithoutFeedback>
 
@@ -81,7 +74,7 @@ const HomePage = () => {
           source={require('./assets/calendar-bg.png')}
           style={styles.calendar}
         >
-          <CalendarScreen></CalendarScreen>
+          <Calendar/>
         </ImageBackground>
       </View>
     </View>

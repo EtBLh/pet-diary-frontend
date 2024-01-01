@@ -1,11 +1,8 @@
 import { StyleSheet } from 'react-native'
 import { TouchableOpacity, ImageBackground, Text } from 'react-native';
-import { normalText, whiteText } from '../util';
+import { normalText, whiteText, boardsSize, boardRatio } from '../util';
 
 export const databoardRatio = 648/224;
-export const boardRatio = 652/414;
-
-export const boardsSize = 320;
 
 const styles = StyleSheet.create({
     HomePageContainer: {

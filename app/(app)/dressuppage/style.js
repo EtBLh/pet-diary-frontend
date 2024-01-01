@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { boardsSize, boardRatio } from '../style';
-import { border, displayText } from '../../util';
+import { border, displayText, boardsSize, boardRatio } from '../../util';
 
 const itemBoxRatio = 350/354;
 
@@ -47,6 +46,11 @@ const styles = StyleSheet.create({
     itemImg: {
         width: "100%",
         flex: 1
+    },
+    itemImgForBg: {
+        width: "80%",
+        flex: 1,
+        marginTop: 10
     },
     pressedItem: {
         marginTop: 9/354*(boardsSize/3 - 10)+5,

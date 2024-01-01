@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
-import { displayText, ImageBackground } from '../../util'
+import { boardContent, displayText, ImageBackground } from '../../util'
 import { Image } from 'expo-image';
 import styles from './style';
-import { normalText } from '../../util';
+import { normalText, boardsSize } from '../../util';
 import Button from '../components/Button';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
-import { boardsSize } from '../style';
 import { DispatchType, useStore } from '../../ctx/store';
 import { CalendarUtils } from 'react-native-calendars';
 import { useAuth } from '../../ctx/auth';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const NormalTextInput = (props) => {
   return (
@@ -59,29 +59,29 @@ const DiaryPage = () => {
         'Content-Type': 'application/json',
       },
     })
-    .then((response) => {
+      .then((response) => {
 
-      const data = response.data;
-      setComment(data.content);
-      setPlace(data.place);
-      setMood(data.mood);
-      setWeight(data.weight);
-      setWaterIntake(data.water_intake);
-      setFoodIntake(data.food_intake);
-      setDefecation(data.defecation);
-      setAbnormality(data.abnormality);
-      setMedicalRecord(data.medical_record);
+        const data = response.data;
+        setComment(data.content);
+        setPlace(data.place);
+        setMood(data.mood);
+        setWeight(data.weight);
+        setWaterIntake(data.water_intake);
+        setFoodIntake(data.food_intake);
+        setDefecation(data.defecation);
+        setAbnormality(data.abnormality);
+        setMedicalRecord(data.medical_record);
 
 
-      if (data.image !== null) {
-        setSelectedImage({ uri: data.image });
-      } else {
-        setSelectedImage(require('../assets/diary/addphoto.png'));
-      }
-    })
-    .catch((error) => {
-      console.error('Error fetching data:', error);
-    });
+        if (data.image !== null) {
+          setSelectedImage({ uri: data.image });
+        } else {
+          setSelectedImage(require('../assets/diary/addphoto.png'));
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }, [date]);
 
   const uploadImageToServer = async (userID, petID, date, imageUri) => {
@@ -117,7 +117,10 @@ const DiaryPage = () => {
       quality: 1,
     });
 
-    const image_url = await uploadImageToServer(auth.userid, auth.petid, '2023-12-31', result.uri);
+    const image_url = await uploadImageToServer(auth.userid, 
+                                                auth.petid, 
+                                                store.state.diaryDate,
+                                                result.uri);
     console.log('Image URL:', image_url);
     if (!result.canceled) {
       setSelectedImage({ uri: image_url });
@@ -165,7 +168,7 @@ const DiaryPage = () => {
 
     const [newWeekday, newDate] = formattedPreviousDate.split(', ');
     setWeekday(newWeekday);
-    store.dispatch({type: DispatchType.CHANGE_DIARY_DATE, payload: CalendarUtils.getCalendarDateString(target)});
+    store.dispatch({ type: DispatchType.CHANGE_DIARY_DATE, payload: CalendarUtils.getCalendarDateString(target) });
 
   };
 
@@ -183,80 +186,83 @@ const DiaryPage = () => {
 
 
   return (
-    <View style={styles.petDiaryContainer}>
-      <Text>{JSON.stringify(auth)}</Text>
-      <View style={styles.dateContainer}>
-        {/* 左侧按钮 */}
-        <TouchableWithoutFeedback onPress={() => handleShiftDay(-1)}>
-          <Text style={{ ...displayText, ...styles.dateArrowContainer }}>{"<"}</Text>
-        </TouchableWithoutFeedback>
+    <ScrollView>
+      <View style={styles.petDiaryContainer}>
+        <View style={styles.dateContainer}>
+          {/* 左侧按钮 */}
+          <TouchableWithoutFeedback onPress={() => handleShiftDay(-1)}>
+            <Text style={{ ...displayText, ...styles.dateArrowContainer }}>{"<"}</Text>
+          </TouchableWithoutFeedback>
 
-        <Text style={styles.dateText}>
-          {`${date} ${weekday}`}
-        </Text>
+          <Text style={styles.dateText}>
+            {`${date} ${weekday}`}
+          </Text>
 
-        {/* 右侧按钮 */}
-        <TouchableWithoutFeedback onPress={() => handleShiftDay(+1)}>
-          <Text style={{ ...displayText, ...styles.dateArrowContainer }}>{">"}</Text>
-        </TouchableWithoutFeedback>
-      </View>
+          {/* 右侧按钮 */}
+          <TouchableWithoutFeedback onPress={() => handleShiftDay(+1)}>
+            <Text style={{ ...displayText, ...styles.dateArrowContainer }}>{">"}</Text>
+          </TouchableWithoutFeedback>
+        </View>
 
-      {/* 上傳圖片 */}
-      <View style={styles.uploadImage}>
+        {/* 上傳圖片 */}
         <TouchableWithoutFeedback onPress={pickImage}>
-          <Image
-            source={require('../assets/diary/addphoto.png')}
+          <ImageBackground
+            source={require('../assets/board.png')}
             style={styles.board}
-          />
+          >
+              <Image
+                source={selectedImage}
+                style={{...boardContent}}
+              />        
+            </ImageBackground>
         </TouchableWithoutFeedback>
+
+        <View style={styles.commentContainer}>
+          <ImageBackground
+            source={require('../assets/longInput.png')}
+            style={[styles.image, { height: 43 }]}
+            resizeMode="contain"
+          >
+            <View style={styles.container}>
+              <TextInput
+                style={normalText}
+                placeholder="enter comment..."
+                width={300}
+                textAlign='center'
+                onChangeText={setComment}
+                value={comment}
+              />
+            </View>
+          </ImageBackground>
+        </View>
+
+        <NormalTextInput label="Place" placeholder="Enter place.." onChangeText={setPlace} value={place} />
+        <NormalTextInput label="Mood" placeholder="Enter mood.." onChangeText={setMood} value={mood} />
+
+        <View style={styles.subtitlecontainer}>
+          <Image
+            source={require('../assets/diary/heart.png')}
+            style={{
+              marginRight: 5,
+              width: 30,
+              height: 30
+            }}
+          />
+          <Text style={normalText}>Health & Care</Text>
+        </View>
+
+        <NormalTextInput label="Weight" placeholder="Enter" suffix="kg" onChangeText={setWeight} value={weight} />
+        <NormalTextInput label="Water Intake" placeholder="Enter" suffix="ml" onChangeText={setWaterIntake} value={waterIntake} />
+        <NormalTextInput label="Food Intake" placeholder="Enter" suffix="g" onChangeText={setFoodIntake} value={foodIntake} />
+        <NormalTextInput label="Defecation" placeholder="Enter" suffix="" onChangeText={setDefecation} value={defecation} />
+        <NormalTextInput label="Abnormality" placeholder="Enter" suffix="" onChangeText={setAbnormality} value={abnormality} />
+        <NormalTextInput label="Medical Record" placeholder="Enter" suffix="" onChangeText={setMedicalRecord} value={medicalRecord} />
+
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', width: "100%" }}>
+          <Button label="save" onPress={handleSave} style={{ marginTop: 5, marginRight: 10 }} />
+        </View>
       </View>
-
-
-      <View style={styles.commentContainer}>
-        <ImageBackground
-          source={require('../assets/longInput.png')}
-          style={[styles.image, { height: 43 }]}
-          resizeMode="contain"
-        >
-          <View style={styles.container}>
-            <TextInput
-              style={normalText}
-              placeholder="enter comment..."
-              width={300}
-              textAlign='center'
-              onChangeText={setComment}
-              value={comment}
-            />
-          </View>
-        </ImageBackground>
-      </View>
-
-      <NormalTextInput label="Place" placeholder="Enter place.." onChangeText={setPlace} value={place} />
-      <NormalTextInput label="Mood" placeholder="Enter mood.." onChangeText={setMood} value={mood} />
-
-      <View style={styles.subtitlecontainer}>
-        <Image
-          source={require('../assets/diary/heart.png')}
-          style={{
-            marginRight: 5,
-            width: 30,
-            height: 30
-          }}
-        />
-        <Text style={normalText}>Health & Care</Text>
-      </View>
-
-      <NormalTextInput label="Weight" placeholder="Enter" suffix="kg" onChangeText={setWeight} value={weight} />
-      <NormalTextInput label="Water Intake" placeholder="Enter" suffix="ml" onChangeText={setWaterIntake} value={waterIntake} />
-      <NormalTextInput label="Food Intake" placeholder="Enter" suffix="g" onChangeText={setFoodIntake} value={foodIntake} />
-      <NormalTextInput label="Defecation" placeholder="Enter" suffix="" onChangeText={setDefecation} value={defecation} />
-      <NormalTextInput label="Abnormality" placeholder="Enter" suffix="" onChangeText={setAbnormality} value={abnormality} />
-      <NormalTextInput label="Medical Record" placeholder="Enter" suffix="" onChangeText={setMedicalRecord} value={medicalRecord} />
-
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', width: "100%" }}>
-        <Button label="save" onPress={handleSave} style={{ marginTop: 5, marginRight: 10 }} />
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 

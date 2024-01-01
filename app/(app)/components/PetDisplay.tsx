@@ -1,25 +1,14 @@
-import { DragResizeBlock, DragResizeContainer } from 'react-native-drag-resize';
+import { DragResizeBlock, DragResizeContainer } from '@skynetcmg47/react-native-drag-resize';
 import { StyleSheet, View, Text } from 'react-native';
-import { boardRatio, boardsSize } from '../style';
-import { border } from '../../util';
+import { boardContent, boardRatio, boardsSize } from '../../util';
 import { useState } from 'react';
 import { Image } from 'expo-image';
 import axios from 'axios';
 import { useAuth } from '../../ctx/auth';
 
-const   PDRatio = 600/370,
-        PDH = 600/646,
-        PDV = 370/414,
-        PDT = 25/414,
-        PDL = 19/646
-
 const styles = StyleSheet.create({
     PetDisplay: {
-        width: PDH * boardsSize,
-        height: PDV * boardsSize / boardRatio,
-        position: 'absolute',
-        top: PDT*100+"%",
-        left: PDL*100+"%"
+        ...boardContent
     },
     itemImg: {
         width: "100%",
@@ -31,7 +20,6 @@ const styles = StyleSheet.create({
 const PetDisplayItem = (props: {
     limitation: any,
     data: any,
-    setData: any,
     disabled: boolean,
     idx: number,
     setSelected: (id:string) => void,
@@ -46,7 +34,6 @@ const PetDisplayItem = (props: {
     const {
         limitation,
         data,
-        setData,
         disabled,
         idx,
         setSelected,
@@ -67,7 +54,7 @@ const PetDisplayItem = (props: {
         h: number,
         zIndex: number
     }) => {
-        axios.post('http://107.191.60.115:81/Dressup/UpdateUserProductPosition',{  
+        const body = {  
             userID: auth.userid,
             petID: auth.petid,
             productID: productid,
@@ -77,7 +64,9 @@ const PetDisplayItem = (props: {
             height: update_data.h,
             type: type,
             zIndex: update_data.zIndex
-        },
+        }
+
+        axios.post('http://107.191.60.115:81/Dressup/UpdateUserProductPosition',body,
         {headers: {'Content-Type': 'application/json'}})
         .then((res) => {
             refetch();
@@ -86,7 +75,7 @@ const PetDisplayItem = (props: {
     }
 
     const select = () => {
-        if (setSelected) {
+        if (setSelected && type !== 'Background') {
             setSelected(productid)
             update({
                 x: data.x,
@@ -98,14 +87,27 @@ const PetDisplayItem = (props: {
         }
     }
 
+    if (type === 'Background') return (
+        <View style={{
+            position: 'absolute',
+            top: limitation.y,
+            left: limitation.x,
+            width: limitation.w,
+            height: limitation.h,
+            zIndex: 0
+        }}>
+            <Image source={{uri: uri}} style={styles.itemImg}></Image>
+        </View>
+    )
+
     return (
         <DragResizeBlock
             {...data}
             limitation={limitation?limitation:undefined}
             onDragEnd={(pos) => {
                 update({
-                    x: pos.x,
-                    y: pos.y,
+                    x: pos[0],
+                    y: pos[1],
                     w: data.w,
                     h: data.h,
                     zIndex: zIndex
@@ -113,10 +115,10 @@ const PetDisplayItem = (props: {
             }}
             onResizeEnd={(size) => {
                 update({
-                    x: data.x,
-                    y: data.y,
-                    w: size.x,
-                    h: size.y,
+                    x: data[0],
+                    y: data[1],
+                    w: size[2],
+                    h: size[3],
                     zIndex: zIndex
                 })
             }}
@@ -138,15 +140,6 @@ const PetDisplay = (props: {
     const [limitation, setLimitation] = useState(null);
     const [selected, setSelected] = useState('');
 
-    const setData = (data) => {
-        let newList = JSON.parse(JSON.stringify(props.dressList)); //Deep clone array
-        newList[0].posX = data.x;
-        newList[0].posY = data.y;
-        newList[0].width = data.w;
-        newList[0].height = data.h;
-        props.setDressList(newList);
-    }
-
     return (
         <DragResizeContainer style={styles.PetDisplay} onInit={limitation=>setLimitation(limitation)}>
             {
@@ -161,7 +154,6 @@ const PetDisplay = (props: {
                             h: product.height
                         }}
                         uri={product.Image}
-                        setData={setData}
                         disabled={!props.edit}
                         idx={idx}
                         setSelected={props.edit?setSelected:undefined}

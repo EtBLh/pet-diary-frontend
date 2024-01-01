@@ -103,7 +103,7 @@ const ItemBox = (props: ItemBoxProps) => {
                 ({ pressed }) =>
                     <ImageBackground source={pressed ? pressedImg : normalImg} style={[styles.itemBox, pressed ? styles.pressedItem : undefined]}>
                         <Image
-                            style={styles.itemImg}
+                            style={props.type === 'Background'?styles.itemImgForBg:styles.itemImg}
                             source={{ uri: props.image }}
                             contentFit="contain"
                         />
