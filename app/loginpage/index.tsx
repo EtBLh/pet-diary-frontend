@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, ImageBackground, TextInput } from "react-native";
 import { displayText, normalText, row } from "../util";
 import Button from '../(app)/components/Button'
 import styles from "./style";
+import { useAuth } from "../ctx/auth";
+import { router } from "expo-router";
 
 const LongInput = (props: {value:string, setValue:(text:string) => void}) => {
     return (
@@ -33,6 +35,15 @@ const LongInput = (props: {value:string, setValue:(text:string) => void}) => {
 }
 
 const LoginPage = () => {
+
+    const auth = useAuth()
+
+    useEffect(() => {
+        if (auth.validated){
+            router.replace('/')
+        }
+    }, [auth.validated])
+
     return (
         <View style={styles.LoginPageContainer}>
             <View style={{...row, marginTop: "10%"}}>
@@ -48,8 +59,9 @@ const LoginPage = () => {
             <LongInput value="1234" setValue={(text) => {0;}}/>
 
             <View style={styles.bottom}>
+                
                 <Text style={{...normalText, borderBottomWidth: 4, borderBottomColor: "black"}}>sign up</Text>
-                <Button label="login"/>
+                <Button label="login" onPress={() => auth.signIn("username_password", "username_testpet")}/>
             </View>
         </View>
     )

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Slot } from 'expo-router';
 
 import { useAuth } from '../ctx/auth';
 
@@ -16,5 +16,5 @@ export default function Protected() {
     return <Redirect href="/loginpage" />;
   }
 
-  return <Stack />;
+  return <Slot />;
 }
