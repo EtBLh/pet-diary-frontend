@@ -55,7 +55,10 @@ const LoginPage = () => {
                 Alert.alert('Login Successful');
                 // Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
                 auth.signIn(userID,petID)
-            } 
+            }
+            else{
+                Alert.alert('Login Unsuccessful');
+            }
         } catch (error) {
             console.error('Error logging in:', error);
         }
