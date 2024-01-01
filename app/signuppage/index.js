@@ -127,8 +127,9 @@ const PetDiaryPage = () => {
 
         const { userID, petID } = response.data;
         if (userID && petID) {
-            Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
+            // Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
             auth.signIn(userID,petID)
+            router.replace('/(app)');
         } 
     } catch (error) {
         console.error('Error logging in:', error);
@@ -167,7 +168,7 @@ const PetDiaryPage = () => {
       });
       // 從回傳數據中獲取圖片 URI 陣列
       const images = response.data.image;
-      Alert.alert('Response from server:', images[1]);
+      // Alert.alert('Response from server:', images[1]);
       // 設置 state
       setImage1Url(images[0]);
       setImage2Url(images[1]);
