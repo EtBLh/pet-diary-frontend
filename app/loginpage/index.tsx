@@ -5,6 +5,7 @@ import Button from '../(app)/components/Button'
 import styles from "./style";
 import { useAuth } from "../ctx/auth";
 import axios from 'axios';
+import {router} from 'expo-router';
 
 const LongInput = (props: {value:string, setValue:(text:string) => void}) => {
     return (
@@ -77,7 +78,7 @@ const LoginPage = () => {
             <LongInput value={password} setValue={setPassword}/>
 
             <View style={styles.bottom}>
-                <Text style={{...normalText, borderBottomWidth: 4, borderBottomColor: "black"}}>sign up</Text>
+                <Button onPress= {() => router.replace("/signuppage")} label="sign up" />
                 <Button label="login" onPress={handleLogin}/>
             </View>
         </View>
