@@ -10,6 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { boardsSize } from '../style';
 import { DispatchType, useStore } from '../../ctx/store';
 import { CalendarUtils } from 'react-native-calendars';
+import { useAuth } from '../../ctx/auth';
 
 const NormalTextInput = (props) => {
   return (
@@ -46,9 +47,12 @@ const DiaryPage = () => {
   const store = useStore();
   const date = store.state.diaryDate;
 
+  const auth = useAuth();
+
   useEffect(() => {
     axios.post('http://107.191.60.115:81/Diary/GetDiaryInfo', {
-      petid: "username_petName",
+      petid: auth.petid,
+      userid: auth.userid,
       date: date
     }, {
       headers: {
@@ -113,7 +117,7 @@ const DiaryPage = () => {
       quality: 1,
     });
 
-    const image_url = await uploadImageToServer('username_password', 'username_petName', '2023-12-31', result.uri);
+    const image_url = await uploadImageToServer(auth.userid, auth.petid, '2023-12-31', result.uri);
     console.log('Image URL:', image_url);
     if (!result.canceled) {
       setSelectedImage({ uri: image_url });
@@ -123,7 +127,7 @@ const DiaryPage = () => {
 
   const handleSave = () => {
     const data = {
-      petid: "username_petName",
+      petid: auth.petid,
       date: date,
       content: comment,
       place: place,
@@ -180,6 +184,7 @@ const DiaryPage = () => {
 
   return (
     <View style={styles.petDiaryContainer}>
+      <Text>{JSON.stringify(auth)}</Text>
       <View style={styles.dateContainer}>
         {/* 左侧按钮 */}
         <TouchableWithoutFeedback onPress={() => handleShiftDay(-1)}>
