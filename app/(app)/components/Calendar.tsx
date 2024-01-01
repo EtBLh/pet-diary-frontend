@@ -1,20 +1,22 @@
 import React, { useState, Fragment, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { Calendar , CalendarUtils } from 'react-native-calendars';
+import { Calendar , CalendarUtils, DateData } from 'react-native-calendars';
 import { useEffect } from 'react';
-
+import { DispatchType, useStore } from '../../ctx/store';
+import { router } from 'expo-router';
 
 
 const PetCalendar = (props) => {
 
     let today = new Date();
 
-    const onDayPress = useCallback((day) => {
-        console.log('pressed: '+day.dateString)
-        //TODO jump to diary page 
-    }, []);
+    const store = useStore();
 
-    // const marked = {};
+    const onDayPress = useCallback((day:DateData) => {
+        //jump to diary page 
+        store.dispatch({type: DispatchType.CHANGE_DIARY_DATE, payload: day.dateString})
+        router.replace('/diarypage')
+    }, []);
 
     const [marked, setMarked] = useState({});
 
@@ -134,9 +136,9 @@ const styles = StyleSheet.create({
         color: "rgba(0,0,0,0.4)"
     },
     todayday: {
-        backgroundColor: "rgba(0,0,0,0.2)"
+        borderColor: "rgba(0,0,0,0.4)"
     },
     marked: {
-        borderColor: "rgba(0,0,0,0.4)"
+        backgroundColor: "rgba(0,0,0,0.2)"
     }
 });

@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { AuthProvider, useAuth } from './ctx/auth';
 import { validateLogIn } from './util'
+import { StoreProvider } from "./ctx/store";
 
 Logs.enableExpoCliLogging()
 
@@ -130,8 +131,10 @@ function Base() {
 
 export default function Root() {
     return (
-      <AuthProvider>
-        <Base />
-      </AuthProvider>
+        <StoreProvider>
+            <AuthProvider>
+                <Base />
+            </AuthProvider>
+        </StoreProvider>
     );
   }

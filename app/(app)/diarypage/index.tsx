@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
-import {displayText, ImageBackground} from '../../util'
+import { displayText, ImageBackground } from '../../util'
 import { Image } from 'expo-image';
 import styles from './style';
 import { normalText } from '../../util';
@@ -8,6 +8,8 @@ import Button from '../components/Button';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { boardsSize } from '../style';
+import { DispatchType, useStore } from '../../ctx/store';
+import { CalendarUtils } from 'react-native-calendars';
 
 const NormalTextInput = (props) => {
   return (
@@ -16,10 +18,11 @@ const NormalTextInput = (props) => {
       <View style={styles.normalTextInputRight}>
         <TextInput
           style={styles.normalTextInputField}
+          value={props.value}
           placeholder={props.placeholder}
-          onChangeText={props.onChangeText} 
+          onChangeText={props.onChangeText}
         />
-        <Text style={normalText}>{props.value}{props.suffix}</Text>
+        <Text style={normalText}>{props.suffix}</Text>
       </View>
     </View>
   )
@@ -37,57 +40,45 @@ const DiaryPage = () => {
   const [abnormality, setAbnormality] = useState('');
   const [medicalRecord, setMedicalRecord] = useState('');
 
-  const [formattedDate, setFormattedDate] = useState('');
   const [weekday, setWeekday] = useState('');
-  const [date, setDate] = useState('');
 
   const [selectedImage, setSelectedImage] = useState(require('../assets/diary/addphoto.png'));
+  const store = useStore();
+  const date = store.state.diaryDate;
 
   useEffect(() => {
-      fetchDataFromApi()
-        .then((data) => {
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-        });
-    }, [date]);
+    axios.post('http://107.191.60.115:81/Diary/GetDiaryInfo', {
+      petid: "username_petName",
+      date: date
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
 
-  const fetchDataFromApi = async () => {
-      try {
-        const response = await axios.post('http://107.191.60.115:81/Diary/GetDiaryInfo', {
-          petid: "username_petName",
-          date: date
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        const data = response.data;
-        setComment(data.content);
-        setPlace(data.place);
-        setMood(data.mood);
-        setWeight(data.weight);
-        setWaterIntake(data.water_intake);
-        setFoodIntake(data.food_intake);
-        setDefecation(data.defecation);
-        setAbnormality(data.abnormality);
-        setMedicalRecord(data.medical_record);
+      const data = response.data;
+      setComment(data.content);
+      setPlace(data.place);
+      setMood(data.mood);
+      setWeight(data.weight);
+      setWaterIntake(data.water_intake);
+      setFoodIntake(data.food_intake);
+      setDefecation(data.defecation);
+      setAbnormality(data.abnormality);
+      setMedicalRecord(data.medical_record);
 
 
-        if (data.image !== null) {
-          setSelectedImage({ uri: data.image });
-        } else {
-          setSelectedImage(require('../assets/diary/addphoto.png'));
-        }
-
-        return response.data;
-      } catch (error) {
-        throw error;
+      if (data.image !== null) {
+        setSelectedImage({ uri: data.image });
+      } else {
+        setSelectedImage(require('../assets/diary/addphoto.png'));
       }
-    };
-
-
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }, [date]);
 
   const uploadImageToServer = async (userID, petID, date, imageUri) => {
     try {
@@ -100,13 +91,13 @@ const DiaryPage = () => {
         type: 'image/jpeg',
         name: 'photo.jpg',
       });
-  
+
       const response = await axios.post('http://107.191.60.115:81/Diary/UploadImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       return response.data.image; // Assuming the server responds with an image URL
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -145,8 +136,6 @@ const DiaryPage = () => {
       medical_record: medicalRecord,
     };
 
-    console.log(data)
-
     axios.post('http://107.191.60.115:81/Diary/UploadDiary', data)
       .then(response => {
         console.log(response.data);
@@ -154,57 +143,26 @@ const DiaryPage = () => {
       .catch(error => {
         console.error(error);
       });
-    
-    
+
+
   }
 
-
-  const handlePreviousDate = async () => {
-    const [month, day, year] = date.split('/');
-    const formattedDate = `${year}-${month}-${day}`;
-
-    const currentDate = new Date(formattedDate);
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(currentDate.getDate() - 1);
+  const handleShiftDay = (shift: number) => {
+    const currentDate = new Date(date);
+    const target = new Date(date);
+    target.setDate(currentDate.getDate() + shift);
 
     const formattedPreviousDate = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
       weekday: 'long',
-    }).format(previousDate);
+    }).format(target);
 
-    setFormattedDate(formattedPreviousDate);
     const [newWeekday, newDate] = formattedPreviousDate.split(', ');
     setWeekday(newWeekday);
-    setDate(newDate);
+    store.dispatch({type: DispatchType.CHANGE_DIARY_DATE, payload: CalendarUtils.getCalendarDateString(target)});
 
-  };
-
-  const handleNextDate = () => {
-    const [month, day, year] = date.split('/');
-    const formattedDate = `${year}-${month}-${day}`;
-
-    const currentDate = new Date(formattedDate);
-    const nextDate = new Date(currentDate);
-    nextDate.setDate(currentDate.getDate() + 1);
-
-    const formattedNextDate = new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      weekday: 'long',
-    }).format(nextDate);
-
-    setFormattedDate(formattedNextDate);
-    const [newWeekday, newDate] = formattedNextDate.split(', ');
-    setWeekday(newWeekday);
-    setDate(newDate);
-  };
-
-  const handleComment = () => {
-    // 处理点击右按钮的逻辑，例如切换到后一天的日期
-    // 可以使用日期库，比如 Moment.js 或 JavaScript 内置的 Date 对象
   };
 
   useEffect(() => {
@@ -213,12 +171,10 @@ const DiaryPage = () => {
       month: 'numeric',
       day: 'numeric',
       weekday: 'long',
-    }).format(new Date());
+    }).format(new Date(date));
 
-    setFormattedDate(newFormattedDate);
     const [newWeekday, newDate] = newFormattedDate.split(', ');
     setWeekday(newWeekday);
-    setDate(newDate);
   }, []);
 
 
@@ -226,18 +182,18 @@ const DiaryPage = () => {
     <View style={styles.petDiaryContainer}>
       <View style={styles.dateContainer}>
         {/* 左侧按钮 */}
-          <TouchableWithoutFeedback onPress={handlePreviousDate}>
-            <Text style={{...displayText, ...styles.dateArrowContainer}}>{"<"}</Text>
-          </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={() => handleShiftDay(-1)}>
+          <Text style={{ ...displayText, ...styles.dateArrowContainer }}>{"<"}</Text>
+        </TouchableWithoutFeedback>
 
-          <Text style={styles.dateText}>
-            {`${date} ${weekday}`}
-          </Text>
+        <Text style={styles.dateText}>
+          {`${date} ${weekday}`}
+        </Text>
 
         {/* 右侧按钮 */}
-          <TouchableWithoutFeedback onPress={handleNextDate}>
-            <Text style={{...displayText, ...styles.dateArrowContainer}}>{">"}</Text>
-          </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={() => handleShiftDay(+1)}>
+          <Text style={{ ...displayText, ...styles.dateArrowContainer }}>{">"}</Text>
+        </TouchableWithoutFeedback>
       </View>
 
       {/* 上傳圖片 */}
@@ -263,15 +219,15 @@ const DiaryPage = () => {
               placeholder="enter comment..."
               width={300}
               textAlign='center'
-              onChangeText={setComment} 
+              onChangeText={setComment}
               value={comment}
             />
           </View>
         </ImageBackground>
       </View>
 
-      <NormalTextInput label="Place" placeholder="Enter place.." onChangeText={setPlace} value={place}/>
-      <NormalTextInput label="Mood" placeholder="Enter mood.." onChangeText={setMood} value={mood}/>
+      <NormalTextInput label="Place" placeholder="Enter place.." onChangeText={setPlace} value={place} />
+      <NormalTextInput label="Mood" placeholder="Enter mood.." onChangeText={setMood} value={mood} />
 
       <View style={styles.subtitlecontainer}>
         <Image
@@ -285,15 +241,15 @@ const DiaryPage = () => {
         <Text style={normalText}>Health & Care</Text>
       </View>
 
-      <NormalTextInput label="Weight" placeholder="Enter" suffix="kg" onChangeText={setWeight} value={weight}/>
-      <NormalTextInput label="Water Intake" placeholder="Enter" suffix="ml" onChangeText={setWaterIntake} value={waterIntake}/>
-      <NormalTextInput label="Food Intake" placeholder="Enter" suffix="g" onChangeText={setFoodIntake} value={foodIntake}/>
-      <NormalTextInput label="Defecation" placeholder="Enter" suffix="" onChangeText={setDefecation} value={defecation}/>
-      <NormalTextInput label="Abnormality" placeholder="Enter" suffix="" onChangeText={setAbnormality} value={abnormality}/>
-      <NormalTextInput label="Medical Record" placeholder="Enter" suffix="" onChangeText={setMedicalRecord} value={medicalRecord}/>
+      <NormalTextInput label="Weight" placeholder="Enter" suffix="kg" onChangeText={setWeight} value={weight} />
+      <NormalTextInput label="Water Intake" placeholder="Enter" suffix="ml" onChangeText={setWaterIntake} value={waterIntake} />
+      <NormalTextInput label="Food Intake" placeholder="Enter" suffix="g" onChangeText={setFoodIntake} value={foodIntake} />
+      <NormalTextInput label="Defecation" placeholder="Enter" suffix="" onChangeText={setDefecation} value={defecation} />
+      <NormalTextInput label="Abnormality" placeholder="Enter" suffix="" onChangeText={setAbnormality} value={abnormality} />
+      <NormalTextInput label="Medical Record" placeholder="Enter" suffix="" onChangeText={setMedicalRecord} value={medicalRecord} />
 
-      <View style={{flexDirection: 'row', justifyContent:'flex-end', width: "100%"}}>
-        <Button label="save" onPress={handleSave} style={{marginTop:5, marginRight: 10}}/>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', width: "100%" }}>
+        <Button label="save" onPress={handleSave} style={{ marginTop: 5, marginRight: 10 }} />
       </View>
     </View>
   );

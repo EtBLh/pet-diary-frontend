@@ -4,7 +4,7 @@ import { useStorageState } from './useStorageState';
 
 export interface TAuth{
   signIn: (userid:string, petid:string) => void,
-signOut: () => void,
+  signOut: () => void,
   userid: null | String,
   petid: null | String,
   UisLoading: Boolean,
@@ -27,7 +27,7 @@ export function useAuth() {
   const value = React.useContext(AuthContext);
   if (process.env.NODE_ENV !== 'production') {
     if (!value) {
-      throw new Error('useSession must be wrapped in a <SessionProvider />');
+      throw new Error('useAuth must be wrapped in a <AuthProvider />');
     }
   }
 
