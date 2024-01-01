@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import {border, normalText} from '../util'
+import {border, normalText} from '../../util'
 import { boardsSize, boardRatio } from '../style';
 
 const styles = StyleSheet.create({

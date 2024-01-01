@@ -1,7 +1,7 @@
 import { DragResizeBlock, DragResizeContainer } from 'react-native-drag-resize';
 import { StyleSheet, View, Text } from 'react-native';
 import { boardRatio, boardsSize } from '../style';
-import { border } from '../util';
+import { border } from '../../util';
 import { useState } from 'react';
 import { Image } from 'expo-image';
 

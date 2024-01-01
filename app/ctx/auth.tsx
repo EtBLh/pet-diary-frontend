@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { useStorageState } from './useStorageState';
 
 export interface TAuth{
   signIn: (userid:string, petid:string) => void,
-  signOut: () => void,
+signOut: () => void,
   userid: null | String,
   petid: null | String,
   UisLoading: Boolean,
-  PisLoading: Boolean
+  PisLoading: Boolean,
+  validated: Boolean
 }
 
 const AuthContext = React.createContext<TAuth>({
@@ -16,7 +18,8 @@ const AuthContext = React.createContext<TAuth>({
     userid: null, // null | string
     petid: null, // null | string
     UisLoading: false,
-    PisLoading: false
+    PisLoading: false,
+    validated: false
 });
 
 // This hook can be used to access the user info.
@@ -31,9 +34,20 @@ export function useAuth() {
   return value;
 }
 
+const validateLogIn = (userid:(string|null), petid:(string|null)) => {
+  //TODO
+  return userid !== null && petid !== null;
+}
+
 export function AuthProvider(props: React.PropsWithChildren) {
   const [[UisLoading, userid], setUserid] = useStorageState('userid');
   const [[PisLoading, petid], setPetid] = useStorageState('petid');
+
+  const [validated, setValidated] = useState(false);
+
+  useEffect(() => {
+    setValidated(validateLogIn(userid, petid))
+  }, [userid, petid])
 
   return (
     <AuthContext.Provider
@@ -47,7 +61,8 @@ export function AuthProvider(props: React.PropsWithChildren) {
             setPetid(null)
         },
         userid, petid,
-        UisLoading, PisLoading
+        UisLoading, PisLoading, 
+        validated: validated
       }}>
       {props.children}
     </AuthContext.Provider>

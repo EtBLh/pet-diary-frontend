@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
-import {displayText, ImageBackground} from '../util'
+import {displayText, ImageBackground} from '../../util'
 import { Image } from 'expo-image';
 import styles from './style';
-import { normalText } from '../util';
+import { normalText } from '../../util';
 import Button from '../components/Button';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -253,7 +253,7 @@ const DiaryPage = () => {
 
       <View style={styles.commentContainer}>
         <ImageBackground
-          source={require('../assets/diary/comment.png')}
+          source={require('../assets/longInput.png')}
           style={[styles.image, { height: 43 }]}
           resizeMode="contain"
         >

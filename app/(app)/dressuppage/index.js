@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import { Image } from 'expo-image';
-import { dummyProductList, ImageBackground } from '../util'
-import { displayText, normalText, row } from "../util";
+import { dummyProductList, ImageBackground } from '../../util'
+import { displayText, normalText, row } from "../../util";
 import styles from './style'
 import Button from '../components/Button'
 import { boardsSize } from "../style";

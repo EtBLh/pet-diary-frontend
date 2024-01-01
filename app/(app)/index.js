@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { Image } from 'expo-image'
-import { dummyProductList, ImageBackground } from './util'
+import { dummyProductList, ImageBackground } from '../util'
 import styles from "./style";
 import CalendarScreen from "./components/Calendar";
 import { router } from 'expo-router';

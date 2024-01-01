@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 import { boardsSize, boardRatio } from '../style';
-import { border, displayText } from '../util';
+import { border, displayText } from '../../util';
 
 const itemBoxRatio = 350/354;
 
