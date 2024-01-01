@@ -1,27 +1,68 @@
 import React, { useEffect, useState  } from 'react';
-import { View, ImageBackground, Image, Text, TextInput, StyleSheet,TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Image, Text, TextInput, Alert, Button} from 'react-native';
 import * as Font from 'expo-font';
 import { TouchableOpacity } from 'react-native';
+import styles from "./style";
+import { displayText, normalText, row } from "../util";
+import axios from 'axios';
+import { useAuth } from "../ctx/auth";
+import { ScrollView } from 'react-native-gesture-handler';
+import {router} from 'expo-router';
 
-const PetButton = ({ petId, petName, isPetSelected, onPress }) => {
+const LongInput = (props: {type:string, value:string, setValue:(text:string) => void}) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={() => onPress(petId)}>
-      <ImageBackground 
-        source={isPetSelected(petId) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
-        style={isPetSelected(petId) ? styles.selectedbuttonImage : styles.buttonImage}
-        resizeMode="contain"
-      >
-        <Text style={styles.buttonText}>{petName}</Text>
-      </ImageBackground>
-    </TouchableOpacity>
+    <View style={styles.inputRow}>
+      <View style={styles.labelContainer}>
+        <Text style={styles.labelText}>{props.type} :</Text>
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={normalText}
+          placeholder="Enter"
+          textAlign='left'
+          onChangeText={props.setValue}
+        />
+      </View>
+      <Text style={styles.unitText}></Text>
+    </View>
   );
 };
 
-const PetDiaryPage = () => {
 
+const PetDiaryPage = () => {
+  const [currentPage, setCurrentPage] = useState(1);
   // 查看選了哪一個選項
   const [selectPet, setSelectPet] = useState(null);
   const [selectGender, setSelectGender] = useState(null);
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [petName, setpetName] = useState('');
+  const [petAge, setpetAge] = useState('');
+  const [petBreeds, setpetBreeds] = useState('');
+  
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [image1Url, setImage1Url] = useState(null);
+  const [image2Url, setImage2Url] = useState(null);
+
+  const auth = useAuth();
+
+  const handleImagePress = (imageId) => {
+    setSelectedImage(imageId);
+  };
+
+  const renderImage = (imageId, imagePath) => (
+    <TouchableOpacity
+      style={[
+        styles.imageContainer,
+        selectedImage === imageId && styles.selectedImageContainer,
+      ]}
+      onPress={() => handleImagePress(imageId)}
+      key={imageId}
+    >
+      <Image source={{ uri: imagePath }} style={styles.optionimage}/>
+    </TouchableOpacity>
+  );
 
   const petPress = (buttonId) => {
     setSelectPet(buttonId);
@@ -38,298 +79,309 @@ const PetDiaryPage = () => {
   };
   // ----------------------------------------- //
   
-  const handleEvent= () => {
+  const signup= async () => {
+    try {
+        let petTypeName = '';
+        switch (selectPet) {
+          case 1:
+            petTypeName = 'Dog';
+            break;
+          case 2:
+            petTypeName = 'Cat';
+            break;
+          case 3:
+            petTypeName = 'Bird';
+            break;
+          case 4:
+            petTypeName = 'Rabbit';
+            break;
+          case 5:
+            petTypeName = 'Mouse';
+            break;
+          case 6:
+            petTypeName = 'Fish';
+            break;
 
-  };
+          default:
+            break;
+        }
+        let igurl = '';
+        switch (selectedImage) {
+          case(1):
+            igurl = image1Url;
+            break;
+          case(2):
+            igurl = image2Url;
+            break;
+        }
 
-  useEffect(() => {
-    const loadFont = async () => {
-      await Font.loadAsync({
-        'PressStart2P-Regular': require('../(app)/assets/fonts/PressStart2P-Regular.ttf'),
-        'PixelifySans': require('../(app)/assets/fonts/PixelifySans-VariableFont_wght.ttf'),
+        const response = await axios.post('http://107.191.60.115:81/User/Register', {
+            username: username,
+            password: password,
+            breed : petBreeds,
+            petName : petName,
+            age : petAge,
+            gender : selectGender,
+            image : igurl,
+        });
+
+        const { userID, petID } = response.data;
+        if (userID && petID) {
+            Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
+            auth.signIn(userID,petID)
+        } 
+    } catch (error) {
+        console.error('Error logging in:', error);
+    }
+};
+
+  const sendSelectPetToBackend = async () => {
+  try {
+      let petTypeName = '';
+
+      switch (selectPet) {
+        case 1:
+          petTypeName = 'Dog';
+          break;
+        case 2:
+          petTypeName = 'Cat';
+          break;
+        case 3:
+          petTypeName = 'Bird';
+          break;
+        case 4:
+          petTypeName = 'Rabbit';
+          break;
+        case 5:
+          petTypeName = 'Mouse';
+          break;
+        case 6:
+          petTypeName = 'Fish';
+          break;
+
+        default:
+          break;
+      }
+      const response = await axios.post('http://107.191.60.115:81/User/GetPetImage', {
+          PetType: petTypeName,
       });
-    };
-    loadFont();
-  }, []); 
+      // 從回傳數據中獲取圖片 URI 陣列
+      const images = response.data.image;
+      Alert.alert('Response from server:', images[1]);
+      // 設置 state
+      setImage1Url(images[0]);
+      setImage2Url(images[1]);
+      
+  } catch (error) {
+      console.error('Error logging in:', error);
+  }
+};
+
+const Nextpage = () => {
+  setCurrentPage(2);  // 假設 signup 是你的註冊函數
+  sendSelectPetToBackend();  // 假設 sendSelectPetToBackend 是發送 selectPet 到後端的函數
+};
+
+  const renderContent = () => {
+    if (currentPage === 1) {
+      return (
+          <View>
+            <View style={styles.signupPageContainer}>
+              <View style={styles.titleContainer}>
+              <Image
+              source={require('../(app)/assets/sign/title.png')} 
+              style={styles.image}
+            />
+        </View>
+
+
+        <LongInput type="Username" value={username} setValue={setUsername}/>
+        <LongInput type="Password" value={password} setValue={setPassword}/>
+
+        <View style={styles.label}>
+            <Text style={normalText}>What is your pet?</Text>
+        </View>
+
+        <View style={styles.container}>
+          <View style={styles.row}>
+            <TouchableOpacity style={styles.button} onPress={() => petPress(1)}>
+              <ImageBackground 
+                source={isPetSelected(1) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
+                style={isPetSelected(1) ? styles.selectedbuttonImage : styles.buttonImage}
+                resizeMode="contain"
+              >
+              <Text style={styles.buttonText}>Dog</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.button} onPress={() => petPress(2)}>
+            <ImageBackground 
+                source={isPetSelected(2) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
+                style={isPetSelected(2) ? styles.selectedbuttonImage : styles.buttonImage}
+                resizeMode="contain"
+              >
+              <Text style={styles.buttonText}>Cat</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.row}>
+            <TouchableOpacity style={styles.button} onPress={() => petPress(3)}>
+              <ImageBackground 
+                source={isPetSelected(3) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
+                style={isPetSelected(3) ? styles.selectedbuttonImage : styles.buttonImage}
+                resizeMode="contain"
+              >
+              <Text style={styles.buttonText}>Bird</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.button} onPress={() => petPress(4)}>
+            <ImageBackground 
+                source={isPetSelected(4) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
+                style={isPetSelected(4) ? styles.selectedbuttonImage : styles.buttonImage}
+                resizeMode="contain"
+              >
+              <Text style={styles.buttonText}>Rabbit</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.row}>
+            <TouchableOpacity style={styles.button} onPress={() => petPress(5)}>
+              <ImageBackground 
+                source={isPetSelected(5) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
+                style={isPetSelected(5) ? styles.selectedbuttonImage : styles.buttonImage}
+                resizeMode="contain"
+              >
+              <Text style={styles.buttonText}>Mouse</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.button} onPress={() => petPress(6)}>
+            <ImageBackground 
+                source={isPetSelected(6) ? require('../(app)/assets/sign/target_option.png') : require('../(app)/assets/sign/option_button.png')}
+                style={isPetSelected(6) ? styles.selectedbuttonImage : styles.buttonImage}
+                resizeMode="contain"
+              >
+              <Text style={styles.buttonText}>Fish</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <LongInput type="Pet Name" value={petName} setValue={setpetName}/>
+        <LongInput type="Pet Age" value={petAge} setValue={setpetAge}/>
+        <LongInput type="Breeds" value={petBreeds} setValue={setpetBreeds}/>
+        
+
+    
+      <View style={styles.genderRow}>
+          <View style={styles.genderContainer}> 
+            <Text style={styles.labelText}>Gender :</Text>
+          </View>
+          <View style={styles.row}>
+          <TouchableOpacity style={styles.genderbutton} onPress={() => genderPress(1)}>
+            <ImageBackground 
+              source={isGenderSelected(1) ? require('../(app)/assets/sign/select_female.png') : require('../(app)/assets/sign/female.png')}
+              style={isGenderSelected(1) ? styles.selectedbuttonImage : styles.buttonImage}
+              resizeMode="contain"
+            >
+            </ImageBackground>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.genderbutton} onPress={() => genderPress(2)}>
+          <ImageBackground 
+              source={isGenderSelected(2) ? require('../(app)/assets/sign/select_male.png') : require('../(app)/assets/sign/male.png')}
+              style={isGenderSelected(2) ? styles.selectedbuttonImage : styles.buttonImage}
+              resizeMode="contain"
+            >
+            </ImageBackground>
+          </TouchableOpacity>
+        </View>
+          <Text style={styles.unitText}></Text>
+      </View>
+
+      <View style={styles.saveContainer}>
+      <TouchableOpacity onPress={() => router.replace("/loginpage")} style={styles.saveButton}>
+            <ImageBackground
+              source={require('../(app)/assets/sign/savebutton.png')}  
+              style={styles.saveBackground}
+              resizeMode="contain"
+            >
+              <Text style={[styles.buttonText,{bottom:5}]}>Back</Text>
+            </ImageBackground>
+          </TouchableOpacity>
+      {/* <Button onPress={() => router.replace("/loginpage")} title="Back" /> */}
+          <TouchableOpacity onPress={Nextpage} style={styles.saveButton}>
+            <ImageBackground
+              source={require('../(app)/assets/sign/savebutton.png')}  
+              style={styles.saveBackground}
+              resizeMode="contain"
+            >
+              <Text style={[styles.buttonText,{bottom:5}]}>Next</Text>
+            </ImageBackground>
+          </TouchableOpacity>
+      </View>
+      </View>
+
+      </View>
+        );
+      } else if (currentPage === 2) {
+        return (
+          <View>
+            <View style={styles.signupPageContainer}>
+              <View style={styles.titleContainer}>
+                <Image
+                source={require('../(app)/assets/sign/title.png')} 
+                style={styles.image}
+                />
+              </View>
+
+            <View style={styles.label}>
+              <Text style={normalText}>How do you want your pet look like in digital world? </Text>
+            </View>
+
+            <View style={styles.container2}>
+
+              <View style={styles.imageRow}>
+                {renderImage(1, image1Url)}
+                {renderImage(2, image2Url)}
+              </View>
+            
+            </View>
+
+            <View style={styles.saveContainer}>
+              <TouchableOpacity onPress={() => setCurrentPage(1)}>
+                  <Text style={[styles.buttonText,{right:150, top:10, borderBottomWidth: 4, borderBottomColor: "black"}]}>back</Text>
+              </TouchableOpacity>
+            
+                <TouchableOpacity onPress={signup} style={styles.saveButton}>
+                  <ImageBackground
+                    source={require('../(app)/assets/sign/savebutton.png')}  
+                    style={styles.saveBackground}
+                    resizeMode="contain"
+                  >
+                    <Text style={styles.buttonText}>create</Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+
+            </View>
+          </View>
+    </View>
+      );
+    }
+  };
 
 
   return (
-    // 背景
-    <ImageBackground
-      source={require('../(app)/assets/background.png')}
-      style={styles.petDiaryContainer}
-      resizeMode="cover" 
-    >
-      {/* 標題 */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Pet Diary</Text>
+    <ScrollView>
+      <View>
+        {renderContent()}
       </View>
-      
-      <View style={styles.imageContainer}>
-        <Image
-          source={require('../(app)/assets/sign/title.png')} 
-          style={styles.image}
-        />
-      </View>
-
-      {/* 問題 */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.questionText}>What is your pet? </Text>
-      </View>
-
-      {/* 選項 */}
-      <View style={styles.container}> 
-        <View style={styles.row}>
-          <PetButton petId={1} petName="Dog" isPetSelected={isPetSelected} onPress={petPress} />
-          <PetButton petId={2} petName="Cat" isPetSelected={isPetSelected} onPress={petPress} />
-        </View>
-
-        <View style={styles.row}>
-          <PetButton petId={3} petName="Bird" isPetSelected={isPetSelected} onPress={petPress} />
-          <PetButton petId={4} petName="Rabbit" isPetSelected={isPetSelected} onPress={petPress} />
-        </View>
-
-        <View style={styles.row}>
-          <PetButton petId={5} petName="Mouse" isPetSelected={isPetSelected} onPress={petPress} />
-          <PetButton petId={6} petName="Fish" isPetSelected={isPetSelected} onPress={petPress} />
-        </View>
-      </View>
-    
-      {/* 輸入選項區 */}
-      <View style={styles.inputRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelText}>Name :</Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter"
-            />
-          </View>
-          <Text style={styles.unitText}></Text>
-      </View>
-
-      <View style={styles.inputRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelText}>Age :</Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter"
-              // 其他 TextInput 相关属性
-            />
-          </View>
-          <Text style={styles.unitText}></Text>
-      </View>
-
-      <View style={styles.inputRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelText}>Breeds :</Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter"
-            />
-          </View>
-          <Text style={styles.unitText}></Text>
-      </View>
-
-    {/* 選擇性別 */}
-    <View style={styles.genderRow}>
-        <View style={styles.genderContainer}> 
-          <Text style={styles.labelText}>Gender :</Text>
-        </View>
-        <View style={styles.row}>
-        <TouchableOpacity style={styles.genderbutton} onPress={() => genderPress(1)}>
-          <ImageBackground 
-            source={isGenderSelected(1) ? require('../(app)/assets/sign/select_female.png') : require('../(app)/assets/sign/female.png')}
-            style={isGenderSelected(1) ? styles.selectedbuttonImage : styles.buttonImage}
-            resizeMode="contain"
-          >
-          </ImageBackground>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.genderbutton} onPress={() => genderPress(2)}>
-        <ImageBackground 
-            source={isGenderSelected(2) ? require('../(app)/assets/sign/select_male.png') : require('../(app)/assets/sign/male.png')}
-            style={isGenderSelected(2) ? styles.selectedbuttonImage : styles.buttonImage}
-            resizeMode="contain"
-          >
-          </ImageBackground>
-        </TouchableOpacity>
-      </View>
-        <Text style={styles.unitText}></Text>
-    </View>
-    
-
-    <View style={styles.saveContainer}>
-        <TouchableOpacity onPress={handleEvent} style={styles.saveButton}>
-          <ImageBackground
-            source={require('../(app)/assets/sign/savebutton.png')}  
-            style={styles.saveBackground}
-            resizeMode="contain"
-          >
-            <Text style={[styles.buttonText,{bottom:5}]}>Next</Text>
-          </ImageBackground>
-        </TouchableOpacity>
-      </View>
-
-
-    </ImageBackground>
+    </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
-  
-  petDiaryContainer: {
-    flex: 1,
-    // resizeMode: 'contain',
-    justifyContent: 'flex-start',  
-    alignItems: 'center',
-  },
-  ImageBackground: {
-    width: '100%', 
-    height: '100%', 
-    resizeMode: 'contain', 
-  },
-  headerContainer: {
-    position: 'absolute',
-    top: 60, 
-    left: 20, 
-  },
-  headerText: {
-    fontSize: 22, 
-    fontWeight: '400',
-    color: '#000000B8',
-    fontFamily: 'PressStart2P-Regular',
-    letterSpacing : 0.88,
-  },
-  imageContainer: {
-    alignItems: 'center', 
-    marginTop: 100, 
-    marginBottom: 0,
-    right: 20 
-  },
-  questionContainer: {
-    justifyContent: 'flex-start', 
-    alignItems: 'flex-start',
-  },
-  questionText: {
-    textAlign: 'left',
-    fontSize: 20,
-    color: '#000000FF',
-    fontFamily: 'PixelifySans',
-    letterSpacing: 0.8,
-    marginTop:10,
-    marginLeft:-150,
-  },
 
-  container: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom:30,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 10,
-    marginLeft:-40,
-  },
-  button: {
-    alignItems: 'center',
-    marginLeft:20,
-  },
-  buttonImage: {
-    width: 111, 
-    height: 50, 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  selectedbuttonImage: {
-    width: 119,
-    height: 56, 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 20,
-    color: '#000000FF',
-    fontFamily: 'PixelifySans',
-    letterSpacing: 0.8,
-  },
-
-
-  inputRow: {
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 10, 
-    left:10,
-  },
-  labelContainer: {
-    flex: 1.5,
-    marginLeft:12,
-    marginRight: 10, 
-    marginTop:10,
-  },
-  labelText: {
-    fontSize: 20,
-    color: 'black',
-    fontFamily: 'PixelifySans',
-  },
-  inputContainer: {
-    flex: 1.5, 
-    borderBottomWidth: 1, 
-    borderColor: 'black',  
-    alignSelf: 'center',  
-  },
-  input: {
-    flex: 1,
-    height: 35, 
-    fontSize: 20, 
-    width:150,
-    fontFamily: 'PixelifySans',
-  },
-  unitText: {
-    flex:0.8,
-  },
-
-  genderRow: {
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 1, 
-    left:10,
-
-  },
-  genderContainer: {
-    flex: 1.5,
-    marginLeft:12,
-    marginRight: 50, 
-    marginTop:10,
-  },
-  genderbutton: {
-    alignItems: 'center',
-    marginLeft:-50,
-  },
-
-  saveContainer: {
-    marginTop: 80,
-    left:100,
-    top:12,
-  },
-  saveButton: {
-    width: 83,  
-    height: 42,  
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  saveBackground: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    resizeMode: 'contain',
-  },
-});
 export default PetDiaryPage;
