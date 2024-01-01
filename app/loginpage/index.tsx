@@ -5,7 +5,7 @@ import Button from '../(app)/components/Button'
 import styles from "./style";
 import { useAuth } from "../ctx/auth";
 import axios from 'axios';
-import {router} from 'expo-router';
+import {router,useNavigation} from 'expo-router';
 
 const LongInput = (props: {value:string, setValue:(text:string) => void}) => {
     return (
@@ -55,6 +55,7 @@ const LoginPage = () => {
                 Alert.alert('Login Successful');
                 // Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
                 auth.signIn(userID,petID)
+                router.replace('/(app)');
             }
             else{
                 Alert.alert('Login Unsuccessful');
