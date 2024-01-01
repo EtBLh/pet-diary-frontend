@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { View, Text, ImageBackground, TextInput } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ImageBackground, TextInput, Alert } from "react-native";
 import { displayText, normalText, row } from "../util";
 import Button from '../(app)/components/Button'
 import styles from "./style";
 import { useAuth } from "../ctx/auth";
-import { router } from "expo-router";
+import axios from 'axios';
 
 const LongInput = (props: {value:string, setValue:(text:string) => void}) => {
     return (
@@ -36,13 +36,31 @@ const LongInput = (props: {value:string, setValue:(text:string) => void}) => {
 
 const LoginPage = () => {
 
-    const auth = useAuth()
+    const auth = useAuth();
+    
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-    useEffect(() => {
-        if (auth.validated){
-            router.replace('/')
+    const handleLogin = async () => {
+        try {
+            console.log('Sending request with username:', username, 'and password:', password);
+            const response = await axios.post('http://107.191.60.115:81/User/Login', {
+                username: username,
+                password: password,
+            });
+            // Alert.alert('Response from server:', response.data);
+            const { userID, petID } = response.data;
+            if (userID && petID) {
+                Alert.alert('Login Successful');
+                // Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
+                auth.signIn(userID,petID)
+            } 
+        } catch (error) {
+            console.error('Error logging in:', error);
         }
-    }, [auth.validated])
+    };
+
+
 
     return (
         <View style={styles.LoginPageContainer}>
@@ -52,16 +70,15 @@ const LoginPage = () => {
             <View style={styles.label}>
                 <Text style={normalText}>username</Text>
             </View>
-            <LongInput value="1234" setValue={(text) => {0;}}/>
+            <LongInput value={username} setValue={setUsername}/>
             <View style={styles.label}>
                 <Text style={normalText}>password</Text>
             </View>
-            <LongInput value="1234" setValue={(text) => {0;}}/>
+            <LongInput value={password} setValue={setPassword}/>
 
             <View style={styles.bottom}>
-                
                 <Text style={{...normalText, borderBottomWidth: 4, borderBottomColor: "black"}}>sign up</Text>
-                <Button label="login" onPress={() => auth.signIn("username_password", "username_testpet")}/>
+                <Button label="login" onPress={handleLogin}/>
             </View>
         </View>
     )
