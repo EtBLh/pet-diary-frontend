@@ -4,6 +4,7 @@ import { Calendar , CalendarUtils, DateData } from 'react-native-calendars';
 import { useEffect } from 'react';
 import { DispatchType, useStore } from '../../ctx/store';
 import { router } from 'expo-router';
+import { useAuth } from '../../ctx/auth';
 
 
 const PetCalendar = (props) => {
@@ -11,6 +12,7 @@ const PetCalendar = (props) => {
     let today = new Date();
 
     const store = useStore();
+    const auth = useAuth();
 
     const onDayPress = useCallback((day:DateData) => {
         //jump to diary page 
@@ -28,8 +30,8 @@ const PetCalendar = (props) => {
         const apiUrl = 'http://107.191.60.115:81/Main/GetMainPageDateInfo';
 
         const requestData = {
-            userID: 'username_password',
-            petID: 'username_petName',
+            userID: auth.userid,
+            petID: auth.petid,
             year: '2024',
             month: '1',
         };
