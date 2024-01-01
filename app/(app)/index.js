@@ -8,16 +8,19 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import PetDisplay from "./components/PetDisplay";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from "../ctx/auth";
 
 const HomePage = () => {
 
-  const [productList, setProductList] = useState(dummyProductList)
+  const [dressList, setDressList] = useState(dummyProductList)
   const [userData, setUserData] = useState({
     name: '',
     breed: '',
     age: '',
     gold: 0,
   });
+
+  const auth = useAuth()
 
   useEffect(() => {
     fetchDataFromApi()
@@ -32,8 +35,8 @@ const HomePage = () => {
   const fetchDataFromApi = async () => {
     try {
       const response = await axios.post('http://107.191.60.115:81/Main/GetMainPagePetInfo', {
-        userID: "username_password",
-        petID: "username_petName"
+        userID: auth.userid,
+        petID: auth.petid
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +58,7 @@ const HomePage = () => {
           source={require('./assets/board.png')}
           style={styles.board}
         >
-          <PetDisplay productList={productList} edit={false} setProductList={setProductList} />
+          <PetDisplay dressList={dressList} edit={false} setDressList={setDressList} />
         </ImageBackground>
       </TouchableWithoutFeedback>
 
