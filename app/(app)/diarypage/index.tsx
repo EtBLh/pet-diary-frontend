@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableWithoutFeedback, Alert } from 'react-native';
 import { boardContent, displayText, ImageBackground } from '../../util'
 import { Image } from 'expo-image';
 import styles from './style';
@@ -35,9 +35,9 @@ const DiaryPage = () => {
   const [place, setPlace] = useState('');
   const [mood, setMood] = useState('');
   const [weight, setWeight] = useState('');
-  const [waterIntake, setWaterIntake] = useState('');
-  const [foodIntake, setFoodIntake] = useState('');
-  const [defecation, setDefecation] = useState('');
+  const [waterIntake, setWaterIntake] = useState(0);
+  const [foodIntake, setFoodIntake] = useState(0);
+  const [defecation, setDefecation] = useState(0);
   const [abnormality, setAbnormality] = useState('');
   const [medicalRecord, setMedicalRecord] = useState('');
 
@@ -146,6 +146,7 @@ const DiaryPage = () => {
     axios.post('http://107.191.60.115:81/Diary/UploadDiary', data)
       .then(response => {
         console.log(response.data);
+        Alert.alert('saved successfully!');
       })
       .catch(error => {
         console.error(error);
@@ -251,9 +252,9 @@ const DiaryPage = () => {
           <Text style={normalText}>Health & Care</Text>
         </View>
 
-        <NormalTextInput label="Weight" placeholder="Enter" suffix="kg" onChangeText={setWeight} value={weight} />
-        <NormalTextInput label="Water Intake" placeholder="Enter" suffix="ml" onChangeText={setWaterIntake} value={waterIntake} />
-        <NormalTextInput label="Food Intake" placeholder="Enter" suffix="g" onChangeText={setFoodIntake} value={foodIntake} />
+        <NormalTextInput label="Weight" placeholder="Enter" suffix="kg" onChangeText={setWeight} value={weight.toString()} />
+        <NormalTextInput label="Water Intake" placeholder="Enter" suffix="ml" onChangeText={setWaterIntake} value={waterIntake.toString()} />
+        <NormalTextInput label="Food Intake" placeholder="Enter" suffix="g" onChangeText={setFoodIntake} value={foodIntake.toString()} />
         <NormalTextInput label="Defecation" placeholder="Enter" suffix="" onChangeText={setDefecation} value={defecation} />
         <NormalTextInput label="Abnormality" placeholder="Enter" suffix="" onChangeText={setAbnormality} value={abnormality} />
         <NormalTextInput label="Medical Record" placeholder="Enter" suffix="" onChangeText={setMedicalRecord} value={medicalRecord} />

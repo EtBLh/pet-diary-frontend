@@ -129,7 +129,7 @@ const PetDiaryPage = () => {
         if (userID && petID) {
             // Alert.alert('Login Successful', `UserID: ${userID}\nPetID: ${petID}`);
             auth.signIn(userID,petID)
-            router.replace('/(app)');
+            router.replace('/');
         } 
     } catch (error) {
         console.error('Error logging in:', error);

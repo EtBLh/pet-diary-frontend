@@ -106,7 +106,6 @@ const DressUPPage = () => {
                 </TouchableWithoutFeedback>
             </View>
             <ScrollView>
-                <Text>{JSON.stringify(initialDressList)}</Text>
                 <View style={styles.itemList}>
                     {
                         shopList === undefined? null:

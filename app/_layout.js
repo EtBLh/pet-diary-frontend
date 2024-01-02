@@ -121,7 +121,7 @@ function Base() {
             <View style={styles.navigations}>
                 <NavigateButton img={require('./(app)/assets/diary/mainbutton.png')} path="/" />
                 <NavigateButton img={require('./(app)/assets/diary/wbutton3.png')} path="/diarypage"/>
-                <NavigateButton img={require('./(app)/assets/diary/healthbutton.png')} path="/" />
+                <NavigateButton img={require('./(app)/assets/diary/healthbutton.png')} path="/dashboardpage" />
                 <NavigateButton img={require('./(app)/assets/diary/settingbutton.png')} path="/settingpage"
                 />
             </View>: null
